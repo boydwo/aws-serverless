@@ -1,0 +1,27 @@
+# org: boydwo
+app: tooling-s3-sqs
+service: tooling-s3-sqs
+
+frameworkVersion: "2 || 3"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+
+plugins:
+  - serverless-localstack
+  - serverless-offline
+  - serverless-mocha-plugin
+
+custom:
+  serverless-offline:
+    useChildProcesses: true
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          method: get
+          path: hello

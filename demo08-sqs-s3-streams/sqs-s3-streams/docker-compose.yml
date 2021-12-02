@@ -1,0 +1,63 @@
+
+version: "3.8"
+
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566" #s3
+      - "127.0.0.1:4571:4571"
+      - "127.0.0.1:4576:4576"
+    environment:
+      - SERVICES=s3, sqs
+      - LAMBDA_EXECUTOR=local
+      - LAMBDA_REMOTE_DOCKER=false
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  app:
+    build: .
+    volumes:
+        - .:/src
+        - nodemodules:/src/node_modules
+    restart: on-failure
+    # command: npm test
+    ports:
+        - 3000:3000
+    links:
+        - localstack
+    depends_on: 
+        - localstack
+    environment: 
+        LOCALSTACK_HOST: localstack
+        S3_PORT: 4566
+        SQS_PORT: 4676
+
+  
+  localstack-s3-ui:
+    container_name: localstack-s3-ui
+    depends_on: [localstack]
+    image: gosuper/localstack-s3-ui
+    ports:
+      - 9000:9000
+    environment:
+      - API_REQ_FILE_PATH=/tmp/localstack/data/recorded_api_calls.json
+      - PORT=9000
+    volumes:
+      - "./.localstack:/tmp/localstack"
+
+  dynamodb-admin:
+    depends_on:
+      - localstack
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - 8001:8001
+    environment:
+      - DYNAMO_ENDPOINT=http://localstack:4566
+
+
+volumes:
+    nodemodules: {}

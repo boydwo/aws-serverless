@@ -37,26 +37,26 @@ services:
         SQS_PORT: 4676
 
   
-  localstack-s3-ui:
-    container_name: localstack-s3-ui
-    depends_on: [localstack]
-    image: gosuper/localstack-s3-ui
-    ports:
-      - 9000:9000
-    environment:
-      - API_REQ_FILE_PATH=/tmp/localstack/data/recorded_api_calls.json
-      - PORT=9000
-    volumes:
-      - "./.localstack:/tmp/localstack"
+  # localstack-s3-ui:
+  #   container_name: localstack-s3-ui
+  #   depends_on: [localstack]
+  #   image: gosuper/localstack-s3-ui
+  #   ports:
+  #     - 9000:9000
+  #   environment:
+  #     - API_REQ_FILE_PATH=/tmp/localstack/data/recorded_api_calls.json
+  #     - PORT=9000
+  #   volumes:
+  #     - "./.localstack:/tmp/localstack"
 
-  dynamodb-admin:
-    depends_on:
-      - localstack
-    image: aaronshaf/dynamodb-admin
-    ports:
-      - 8001:8001
-    environment:
-      - DYNAMO_ENDPOINT=http://localstack:4566
+  # dynamodb-admin:
+  #   depends_on:
+  #     - localstack
+  #   image: aaronshaf/dynamodb-admin
+  #   ports:
+  #     - 8001:8001
+  #   environment:
+  #     - DYNAMO_ENDPOINT=http://localstack:4566
 
 
 volumes:
